@@ -6,7 +6,7 @@ const [data, setData] = useState([]);
 
 
 useEffect(() => {
-fetch('https://<api-id>.execute-api.<region>.amazonaws.com/dev/results')
+fetch('https://gq0y8m7fpd.execute-api.us-east-1.amazonaws.com/dev/results')
 .then(res => res.json())
 .then(json => setData(json.body))
 .catch(console.error);
