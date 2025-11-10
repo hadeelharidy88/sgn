@@ -6,7 +6,7 @@ const [data, setData] = useState([]);
 
 
 useEffect(() => {
-fetch('https://gq0y8m7fpd.execute-api.us-east-1.amazonaws.com/dev/results')
+fetch('https://8b5d0od9de.execute-api.us-east-1.amazonaws.com/dev/results')
 .then(res => res.json())
 .then(json => setData(json.body))
 .catch(console.error);
