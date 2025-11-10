@@ -1,41 +1,71 @@
-import React, { useEffect, useState } from 'react';
+
+import React, { useState } from "react";
+
+const API_URL = "https://8b5d0od9de.execute-api.us-east-1.amazonaws.com/dev/results";
 
 function App() {
-  const [results, setResults] = useState(null);
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState([]);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetch('https://8b5d0od9de.execute-api.us-east-1.amazonaws.com/dev/results', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-        // Include Authorization here if needed (e.g. Cognito ID token or IAM SigV4)
+  const runQuery = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+
+      if (data.results) {
+        setResults(data.results);
+      } else {
+        setError("No results found or query failed.");
       }
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`API error: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        console.log('API response:', data);
-        setResults(data);
-      })
-      .catch((err) => {
-        console.error('API call failed:', err);
-        setError(err.message);
-      });
-  }, []);
+    } catch (err) {
+      console.error(err);
+      setError("Error running query");
+    }
+    setLoading(false);
+  };
 
   return (
-    <div style={{ padding: '2rem' }}>
+    <div style={{ padding: "2rem", fontFamily: "Arial" }}>
       <h1>Simulation Results</h1>
-      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-      {results ? (
-        <pre>{JSON.stringify(results, null, 2)}</pre>
-      ) : (
-        <p>Loading...</p>
+      <button
+        onClick={runQuery}
+        style={{
+          padding: "10px 20px",
+          backgroundColor: "#007bff",
+          color: "#fff",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+          marginBottom: "20px"
+        }}
+      >
+        {loading ? "Running..." : "Run Simulation"}
+      </button>
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {results.length > 0 && (
+        <table border="1" cellPadding="10">
+          <thead>
+            <tr>
+              {Object.keys(results[0]).map((col) => (
+                <th key={col}>{col}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {results.map((row, idx) => (
+              <tr key={idx}>
+                {Object.values(row).map((val, idy) => (
+                  <td key={idy}>{val}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );
